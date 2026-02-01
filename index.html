@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JoyRadAR</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Main Container -->
+    <div class="app-container">
+
+        <!-- TAB 1: RADAR -->
+        <div id="tab-radar" class="tab-content active">
+
+            <!-- Setup View -->
+            <div id="radar-setup" class="view active">
+                <header class="header">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                        <img src="assets/logo.svg" alt="JoyRadAR Icon" width="48" height="48">
+                        <h1 style="margin:0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">JoyRadAR</h1>
+                    </div>
+                    <p class="subtitle">La ciudad que no conoces.</p>
+                </header>
+
+                <div class="section">
+                    <label class="input-label">Ubicación</label>
+                    <div class="input-group">
+                        <input type="text" id="location-input" placeholder="Ej. Centro, Santiago">
+                        <button id="btn-location" class="icon-btn" aria-label="Usar mi ubicación">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2L12 22"></path>
+                                <path d="M2 12L22 12"></path>
+                                <circle cx="12" cy="12" r="7"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <label class="input-label">Intereses</label>
+                    <div class="chips-container" id="interests-chips">
+                        <!-- Chips injected by JS -->
+                    </div>
+                </div>
+
+                <div class="section">
+                    <label class="input-label">Momento</label>
+                    <div class="segmented-control" id="time-selector">
+                        <button class="segment" data-value="mañana">Mañana</button>
+                        <button class="segment" data-value="tarde">Tarde</button>
+                        <button class="segment active" data-value="noche">Noche</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="toggle-row">
+                        <span>Modo RA (simulado)</span>
+                        <label class="switch">
+                            <input type="checkbox" id="ra-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="btn-discover" class="btn-primary">Descubrir planes</button>
+            </div>
+
+            <!-- Results View -->
+            <div id="radar-results" class="view hidden">
+                <!-- AR Header (conditionally shown) -->
+                <div id="ar-view" class="ar-overlay hidden">
+                    <div class="ar-background">
+                        <!-- CSS shapes for simulated street -->
+                        <div class="street-light"></div>
+                        <div class="building-silhouette-1"></div>
+                        <div class="building-silhouette-2"></div>
+                    </div>
+                    <div class="ar-markers-container" id="ar-markers">
+                        <!-- Markers injected by JS -->
+                    </div>
+                    <div class="ar-overlay-ui" style="position: absolute; top: 16px; left: 16px; z-index: 200;">
+                        <button id="btn-ar-back" class="icon-btn"
+                            style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); color: white; width: 40px; height: 40px; border-radius: 50%;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="ar-overlay-text">Vista RA (Simulada)</div>
+                </div>
+
+                <div class="ios-nav-bar">
+                    <button class="ios-back-btn" id="btn-reset-radar">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <h1 class="ios-nav-title">Top Selecciones</h1>
+                    <div style="width: 40px;"></div>
+                </div>
+
+                <div id="results-list" class="cards-list">
+                    <!-- Cards injected by JS -->
+                </div>
+
+                <div id="editorial-rejection" class="editorial-block">
+                    <!-- Rejection text injected by JS -->
+                </div>
+
+                <button id="btn-go-to-map" class="btn-secondary">Ver en mapa</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: MAPA -->
+        <div id="tab-map" class="tab-content">
+            <div class="ios-nav-bar">
+                <button class="ios-back-btn" onclick="app.switchTab('radar')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 class="ios-nav-title">Mapa</h1>
+                <div style="width: 40px;"></div>
+            </div>
+            <div class="mock-map">
+                <div class="map-grid"></div>
+                <div class="map-pins-container" id="map-pins">
+                    <!-- Pins injected by JS -->
+                </div>
+                <!-- User Location Pin -->
+                <div class="user-pin" style="top: 50%; left: 50%;"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: RUTAS -->
+        <div id="tab-routes" class="tab-content">
+            <div class="ios-nav-bar">
+                <button class="ios-back-btn" onclick="app.switchTab('radar')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 class="ios-nav-title">Rutas Editoriales</h1>
+                <div style="width: 40px;"></div>
+            </div>
+            <div style="padding: 0 20px;">
+                <p class="subtitle" style="margin-bottom: 20px;">Curaduría experta para ti.</p>
+                <div id="routes-list" class="cards-list">
+                    <!-- Routes injected by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: GUARDADOS -->
+        <div id="tab-saved" class="tab-content">
+            <header class="header">
+                <h1>Guardados</h1>
+            </header>
+            <div id="saved-list" class="cards-list">
+                <!-- Saved items injected by JS -->
+            </div>
+            <div id="empty-saved" class="empty-state hidden">
+                <p>Aún no tienes planes guardados.</p>
+                <button class="btn-secondary" onclick="app.switchTab('radar')">Ir al Radar</button>
+            </div>
+        </div>
+
+        <!-- TAB 5: PERFIL -->
+        <div id="tab-profile" class="tab-content">
+            <header class="header">
+                <h1>Perfil</h1>
+            </header>
+            <div class="profile-section">
+                <h3>Tus Preferencias</h3>
+                <div id="profile-prefs" class="chips-display"></div>
+            </div>
+            <div class="profile-section">
+                <div class="toggle-row">
+                    <span>Modo RA por defecto</span>
+                    <label class="switch">
+                        <input type="checkbox" id="profile-ra-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="profile-footer">
+                <p class="transparency-note">“La IA ayuda a filtrar, el criterio editorial decide.”</p>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-target="radar">
+                <span class="icon">◎</span>
+                <span class="label">Radar</span>
+            </button>
+            <button class="nav-item" data-target="map">
+                <span class="icon">⚲</span>
+                <span class="label">Mapa</span>
+            </button>
+            <button class="nav-item" data-target="routes">
+                <span class="icon">⌘</span>
+                <span class="label">Rutas</span>
+            </button>
+            <button class="nav-item" data-target="saved">
+                <span class="icon">♥</span>
+                <span class="label">Guardados</span>
+            </button>
+            <button class="nav-item" data-target="profile">
+                <span class="icon">👤</span>
+                <span class="label">Perfil</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- DETAILS MODAL -->
+    <div id="details-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-btn" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-image-placeholder"></div>
+            <div class="modal-body">
+                <h2 id="modal-title">Título Evento</h2>
+                <div class="modal-meta">
+                    <span id="modal-category" class="badge">Categoría</span>
+                    <span id="modal-time">22:00</span>
+                    <span id="modal-price">$$</span>
+                </div>
+                <p id="modal-description" class="modal-desc">Descripción editorial...</p>
+                <div class="modal-actions">
+                    <button class="btn-primary">Comprar / Reservar</button>
+                    <button class="btn-secondary">Cómo llegar</button>
+                    <button class="btn-outline" id="modal-toggle-save">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
